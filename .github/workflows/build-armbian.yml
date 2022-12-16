@@ -12,7 +12,7 @@ on:
       set_release:
         description: "Select OS Release."
         required: false
-        default: "jammy"
+        default: "bullseye"
         type: choice
         options:
           - jammy
@@ -20,7 +20,7 @@ on:
       armbian_board:
         description: "Select Box Board."
         required: false
-        default: "all"
+        default: "s905l3a"
         type: choice
         options:
           - all
@@ -51,7 +51,7 @@ on:
       armbian_kernel:
         description: "Select kernel version."
         required: false
-        default: "5.15.80_6.0.10"
+        default: "5.15.80"
         type: choice
         options:
           - 5.4.225_5.10.155_5.15.80
@@ -82,7 +82,7 @@ on:
       armbian_sign:
         description: "Set armbian custom name."
         required: false
-        default: ""
+        default: "_Voron"
 
 env:
   TZ: America/New_York

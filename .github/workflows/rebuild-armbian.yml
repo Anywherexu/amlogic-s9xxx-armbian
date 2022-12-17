@@ -16,7 +16,7 @@ on:
       armbian_board:
         description: "Select Amlogic Board."
         required: false
-        default: "all"
+        default: "s905l3a"
         type: choice
         options:
           - all
@@ -47,16 +47,16 @@ on:
       armbian_kernel:
         description: "Select kernel version."
         required: false
-        default: "5.15.80_6.0.10"
+        default: "5.19.17"
         type: choice
         options:
           - 5.4.225_5.10.155_5.15.80
           - 5.4.225_5.10.155
           - 5.10.155_5.15.80
           - 5.15.80_6.0.10
-          - 5.4.225
+          - 5.19.17
           - 5.10.155
-          - 5.15.80
+          - 5.15.83
           - 6.0.10
       auto_kernel:
         description: "Auto use the latest kernel."
@@ -66,7 +66,7 @@ on:
       armbian_size:
         description: "Set armbian rootfs size(Unit: MiB)."
         required: false
-        default: "2560"
+        default: "5120"
       armbian_fstype:
         description: "Set armbian rootfs type."
         required: false
@@ -78,7 +78,7 @@ on:
       armbian_sign:
         description: "Set armbian custom name."
         required: false
-        default: ""
+        default: "_Voron"
 
 env:
   TZ: America/New_York
@@ -135,7 +135,7 @@ jobs:
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Rebuild Armbian for Amlogic s9xxx
-        uses: ophub/amlogic-s9xxx-armbian@main
+        uses: Anywherexu/amlogic-s9xxx-armbian@main
         if: ${{ env.ARMBIAN_URL }} != '' && !cancelled()
         with:
           build_target: armbian

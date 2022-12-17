@@ -76,9 +76,9 @@ kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
 # Convert kernel library address to svn format
 kernel_repo="${kernel_repo//tree\/main/trunk}"
 # Common kernel directory, RK3588 kernel directory, [ rk3588 ] is the fixed name
-kernel_dir=("stable" "rk3588")
-common_kernel=("6.0.10" "5.15.50")
-rk3588_kernel=("5.10.150")
+kernel_dir=("stable")              # "rk3588"
+common_kernel=("6.0.10" "5.19.17")
+# rk3588_kernel=("5.10.150")
 auto_kernel="true"
 
 # Set supported board
@@ -100,7 +100,7 @@ build_armbian=(
 
 # Set Armbian firmware size (Unit: MiB, BOOT_MB >= 256, ROOT_MB >= 2048)
 BOOT_MB="256"
-ROOT_MB="2560"
+ROOT_MB="5120"
 # Set ROOTFS partition file system type, options: [ ext4 / btrfs ]
 ROOTFS_TYPE="ext4"
 # Custom name in firmware name: ${build_image_file}, such as _server, _dev, etc.

@@ -60,7 +60,7 @@ repo_owner="unifreq"
 repo_branch="main"
 build_kernel=("5.10.125" "5.15.50")
 auto_kernel="true"
-custom_name="-ophub"
+custom_name="-Andyxu"
 # Set the kernel compile object, options: dtbs / all
 package_list="all"
 #

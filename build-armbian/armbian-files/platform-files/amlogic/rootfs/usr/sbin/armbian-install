@@ -133,10 +133,10 @@ init_var() {
     # Find emmc disk, find emmc that does not contain the boot0 partition
     [[ -z "${install_emmc}" ]] && install_emmc="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?)' | grep -vE ^${root_devname} | uniq)"
     # Check if emmc exists
-    [[ -z "${install_emmc}" ]] && error_msg "No emmc can be found to install the armbian system!"
+    [[ -z "${install_emmc}" ]] && error_msg "The eMMC storage not found in this device!"
     # Location of emmc
     DEV_EMMC="/dev/${install_emmc}"
-    echo -e "${INFO} DEV_EMMC: [ ${DEV_EMMC} ]"
+    echo -e "${INFO} The device eMMC name: [ ${DEV_EMMC} ]"
 
     # Create a file preprocessing directory
     [[ -d "${tmp_path}" ]] && rm -rf ${tmp_path}/* 2>/dev/null && sync
@@ -242,11 +242,11 @@ EOF
     if [[ "${filetype}" -eq "2" || "${filetype}" == "btrfs" ]]; then
         file_system_type="btrfs"
         uenv_mount_string="UUID=${ROOTFS_UUID} rootflags=compress=zstd:6 rootfstype=btrfs"
-        fstab_mount_string="defaults,noatime,compress=zstd:6"
+        fstab_mount_string="discard,defaults,noatime,compress=zstd:6"
     else
         file_system_type="ext4"
         uenv_mount_string="UUID=${ROOTFS_UUID} rootflags=data=writeback rw rootfstype=ext4"
-        fstab_mount_string="defaults,noatime,errors=remount-ro"
+        fstab_mount_string="discard,defaults,noatime,errors=remount-ro"
     fi
     echo -e "${INFO} Input Type ID: [ ${filetype} ]"
     echo -e "${INFO} The type of file system: [ ${file_system_type} ]"
@@ -297,11 +297,9 @@ create_partition() {
     # Backup the bootloader, if necessary for system recovery
     [[ -d "/usr/lib/u-boot" ]] || mkdir -p /usr/lib/u-boot
     MYBOX_UBOOT="/usr/lib/u-boot/mybox-bootloader.img"
-    if [[ ! -f "${MYBOX_UBOOT}" ]]; then
-        echo -e "${INFO} Start backup default bootloader."
-        dd if="${DEV_EMMC}" of=${MYBOX_UBOOT} bs=1M count=4 conv=fsync
-    fi
-    sync
+    [[ -f "${MYBOX_UBOOT}" ]] && rm -f ${MYBOX_UBOOT}
+    echo -e "${INFO} Start backup default bootloader."
+    dd if="${DEV_EMMC}" of="${MYBOX_UBOOT}" bs=1M count=4 conv=fsync
 
     # Clear emmc disk data
     exists_pts="$(parted ${DEV_EMMC} print 2>/dev/null | grep 'primary' | wc -l)"
@@ -313,7 +311,6 @@ create_partition() {
         done
     fi
     dd if=/dev/zero of=${DEV_EMMC} bs=512 count=1 conv=fsync
-    sync
 
     # Use the ampart partition tool
     AMPART_STATUS="no"
@@ -375,8 +372,8 @@ create_partition() {
         dd if="/usr/lib/u-boot/${BOOTLOADER_IMG}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
     elif [[ -n "${MYBOX_UBOOT}" && -f "${MYBOX_UBOOT}" ]]; then
         echo -e "${INFO} Restore the mybox bootloader: [ ${MYBOX_UBOOT} ]"
-        dd if=${MYBOX_UBOOT} of="${DEV_EMMC}" conv=fsync bs=1 count=444
-        dd if=${MYBOX_UBOOT} of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
+        dd if="${MYBOX_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=1 count=444
+        dd if="${MYBOX_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
     fi
 }
 
@@ -500,9 +497,9 @@ copy_rootfs() {
     echo -e "${INFO} Generate the new fstab file."
     rm -f ${DIR_INSTALL}/etc/fstab 2>/dev/null && sync
     cat >${DIR_INSTALL}/etc/fstab <<EOF
-UUID=${ROOTFS_UUID}  /        ${file_system_type}     ${fstab_mount_string}     0 1
-LABEL=BOOT_EMMC      /boot    vfat                    defaults                  0 2
-tmpfs                /tmp     tmpfs                   defaults,nosuid           0 0
+UUID=${ROOTFS_UUID}    /        ${file_system_type}    ${fstab_mount_string}      0 1
+LABEL=BOOT_EMMC        /boot    vfat                   discard,defaults           0 2
+tmpfs                  /tmp     tmpfs                  defaults,nosuid            0 0
 
 EOF
 

@@ -1718,6 +1718,7 @@ CONFIG_CAN_UCAN=m
 # CONFIG_CAN_DEBUG_DEVICES is not set
 # end of CAN Device Drivers
 
+
 # CONFIG_HAMRADIO is not set
 CONFIG_BT=m
 CONFIG_BT_BREDR=y
